@@ -18,15 +18,15 @@ function SelectPrecannedReply(sObjectClass, iObjectKey, sLogAttCode)
 	$('#precanned_button_'+sLogAttCode).prop('disabled', true);
 	$('#v_precanned_'+sLogAttCode).html('<img src="../images/indicator.gif" />');
 
-	var $aJsonData = {'json' : GetWizardHelperJsonPrecannedReply()};
-	if(Object.keys($aJsonData['json']).length === 0) {
-		$aJsonData = {
+	var aJsonData = {'json' : GetWizardHelperJsonPrecannedReply()};
+	if(Object.keys(aJsonData['json']).length === 0) {
+		aJsonData = {
 			'object_class': $('[data-role="ibo-object-details"]').attr('data-object-class'),
 			'object_id': $('[data-role="ibo-object-details"]').attr('data-object-id')
 		}
 	}
 	
-	var theMap = $.extend($aJsonData, {
+	var theMap = $.extend(aJsonData, {
 		operation: 'select_precanned',
 		obj_class: sObjectClass,
 		obj_id: iObjectKey,
@@ -89,15 +89,15 @@ function PrecannedDoSelect(sLogAttCode)
 		var index = 0;
 		selected.each( function () { aSelected[index++] = this.value; });
 
-		var $aJsonData = {'json' : GetWizardHelperJsonPrecannedReply()};
-		if(Object.keys($aJsonData['json']).length === 0) {
-			$aJsonData = {
+		var aJsonData = {'json' : GetWizardHelperJsonPrecannedReply()};
+		if(Object.keys(aJsonData['json']).length === 0) {
+			aJsonData = {
 				'object_class': $('[data-role="ibo-object-details"]').attr('data-object-class'),
 				'object_id': $('[data-role="ibo-object-details"]').attr('data-object-id')
 			}
 		}
 
-		var theMap = $.extend($aJsonData, {
+		var theMap = $.extend(aJsonData, {
 			operation: 'add_precanned',
 			selected: aSelected,
 			log_attcode: sLogAttCode
