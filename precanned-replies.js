@@ -8,7 +8,7 @@ function GetWizardHelperJsonPrecannedReply() {
 	}
 	return aReturn;
 }
-function SelectPrecannedReply(sObjectClass, iObjectKey, sLogAttCode)
+function SelectPrecannedReply(sObjectClass, iObjectKey, sLogAttCode, sInstanceAttributes)
 {
 	if ($('#precanned_button_'+sLogAttCode).prop('disabled')) return; // Disabled, do nothing
 	if ($('#precanned_dlg').length == 0)
@@ -59,7 +59,7 @@ function SelectPrecannedReply(sObjectClass, iObjectKey, sLogAttCode)
 						class: "ibo-is-regular ibo-is-primary",
 						id: "btn_ok_{{ oUIBlock.sLinkedSetId }}",
 						click: function() {
-							PrecannedDoSelect(sLogAttCode);
+							PrecannedDoSelect(sLogAttCode, sInstanceAttributes);
 						}
 					},
 				],}
@@ -79,7 +79,7 @@ function OnClosePrecannedReply(sLogAttCode)
 	$('#v_precanned_'+sLogAttCode).html('');
 }
 
-function PrecannedDoSelect(sLogAttCode)
+function PrecannedDoSelect(sLogAttCode, sInstanceAttributes)
 {
 	var selected = $('#datatable_search_form_result_precanned_select input:checked');
 
@@ -109,7 +109,7 @@ function PrecannedDoSelect(sLogAttCode)
 			{
 				var sText = aJson[0].text;
 				var iPrecannedId = aJson[0].id;
-				var sInstanceCode =  $('[data-role="ibo-caselog-entry-form"][data-attribute-code="'+sLogAttCode+'"] textarea').attr('id');
+				var sInstanceCode = $(sInstanceAttributes + ' textarea').attr('id');
 
 				if (typeof CombodoCKEditorHandler !== 'undefined') {
 					CombodoCKEditorHandler.InsertHtmlInsideInstance('#' +sInstanceCode, sText);
