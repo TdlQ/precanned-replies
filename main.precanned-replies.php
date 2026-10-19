@@ -37,7 +37,7 @@
 // Extend the class AsyncTask to create a queue of asynchronous tasks (process by the cron)
 // Declare a class that implements iApplicationUIExtension (to tune object display and edition form)
 
-class PrecannedRepliesPlugIn implements iApplicationUIExtension
+class PrecannedRepliesPlugIn implements iApplicationUIExtension, iStimulusFormExtension
 {
 	public const XML_LEGACY_VERSION = '';
 
@@ -78,6 +78,32 @@ CombodoTooltip.InitTooltipFromMarkup($('#precanned_button'), true);
 JS
                 );
             }
+		}
+	}
+
+	public function OnDisplayStimulusForm($oObject, WebPage $oPage)
+	{
+
+		if (self::IsTargetObject($oObject) && !$oObject->IsNew())
+		{
+
+			$oPage->LinkScriptFromModule('precanned-replies/precanned-replies.js');
+			$sButtonLabel = Dict::S('UI:Button-AddReply');
+			$oPage->add_dict_entry('UI:Dlg-PickAReply');
+			$sButtonLTooltip = $sButtonLabel;
+			$sButtonLabel = Dict::S('UI:Button-AddReply:Short');
+
+			$sObjectClass = get_class($oObject);
+			$iObjectId = $oObject->GetKey();
+			// Iterate on the caselogs applicables to object class
+			$aAttCodes = self::GetLogAttCodes($oObject);
+			foreach($aAttCodes as $sAttCode) {
+				$oPage->add_ready_script(
+					<<<JS
+$('[data-role=\"ibo-field\"][data-attribute-code=\"$sAttCode\"]').append('<div id=\"precanned_replies_$sAttCode\" style=\"display:inline-block;\"><button type=\"button\" class=\"emry-button ibo-button ibo-is-regular ibo-is-neutral\" id=\"precanned_button_$sAttCode\" value=\"$sButtonLabel\" onClick=\"SelectPrecannedReply(\'$sObjectClass\', \'$iObjectId\', \'$sAttCode\', \'[data-role=&quot;ibo-field&quot;][data-attribute-code=&quot;$sAttCode&quot;]\')\" data-tooltip-content=\"$sButtonLTooltip\"><span class=\"ibo-button--icon fas fa-file-invoice\"></span><span class=\"ibo-button--label\">$sButtonLabel</span></button><span id=\"v_precanned_$sAttCode\"></span></div>');
+JS
+				);
+			}
 		}
 	}
 
@@ -147,8 +173,11 @@ JS
             }
         }
         foreach ($aParams as $i => $sAttCode) {
-            if (MetaModel::IsValidAttCode($sObjClass, $sAttCode) && (MetaModel::GetAttributeDef($sObjClass, $sAttCode) instanceof AttributeCaseLog)) {
-                $aCaselogs[] = $sAttCode;
+            if (MetaModel::IsValidAttCode($sObjClass, $sAttCode)) {
+                $oAttDef = MetaModel::GetAttributeDef($sObjClass, $sAttCode);
+                if ($oAttDef instanceof AttributeCaseLog | $oAttDef instanceof AttributeText) {
+                    $aCaselogs[] = $sAttCode;
+                }
             }
         }
         return $aCaselogs;
